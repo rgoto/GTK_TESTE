@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+#include "funcoes.h"
 
 #define VALOR_MIN 0.0
 #define VALOR_MAX 1.0
@@ -11,8 +13,10 @@
 GtkBuilder *builder;
 
 GtkWindow *window;
-
+GtkLabel *label;
 GtkEntry *entry;
+
+void gtk_config_spin();
 
 void gtk_start(int argc, char **argv){
 
@@ -72,6 +76,20 @@ return _spin;
 
 }
 
+double * get_value_from_spin(){
+
+GtkSpinButton **spin = gtk_get_spin();
+
+    static double value[9];
+
+    for(int i = 0; i < 9; i++){
+        value[i] = gtk_spin_button_get_value(spin[i]);
+    
+    }
+
+    return value;
+}
+
 
 
 
@@ -94,4 +112,35 @@ void gtk_config_spin(){
 
             gtk_spin_button_set_adjustment (spin[i], adjustment);
         }
+
+}
+
+
+typedef double (*Func) (double);
+
+
+double iqacalc(){
+    double *pesos = get_value_from_spin();
+    double *equacoes = gtk_get_value();
+    double iqa = 1;
+
+
+    Func funcoes[9] = {CF, PH, DBO, NT, FT, VT, TU, OD, ST};
+
+    for (int i=0; i < 9; i++){
+
+      iqa *= pow(funcoes[i](equacoes[i]), pesos[i]);
+
+    }
+
+
+    return iqa;
+}
+
+void gtk_write_in_label(GtkLabel *_label, double value) {
+
+    char message[10];
+    sprintf(message, "%f", value);
+
+    gtk_label_set_text(_label, message);
 }
